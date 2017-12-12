@@ -3,11 +3,14 @@ var timers = require('countdown-timer-js');
 var moment = require('moment');
 
 //Global variables
-let timer = new CountDownTimer(timeInterval);
+let timer = null;
 
-//Wireframe to manage t2m status checks
-timer.subscribe(function(times, parameters) {
-});
+let initializeApplication = () => {
+  console.log('Setting initial time span to five minutes.');
+  timer = new CountDownTimer("00:00:00");
+  updateTime(0, 5, 0);
+  timerSetup();
+}
 
 //Update the time interval.
 let updateTime = (hours, minutes, seconds) => {
@@ -25,3 +28,10 @@ let updateTime = (hours, minutes, seconds) => {
 
   timer.setTimes(hours + ":" + minutes + ":" + seconds);
 }
+let timerSetup = () => {
+  timer.subscribe((times, parameters) => {
+    console.log(times);
+  });
+}
+
+initializeApplication();
