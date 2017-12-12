@@ -1,0 +1,19 @@
+{
+  "name": "t2mstatus",
+  "version": "1.0.0",
+  "description": "A program to dtermine if Talk2M is reachable. ",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jose-hms/t2mstatus.git"
+  },
+  "author": "Jordan Seanor",
+  "license": "ISC",
+  "dependencies": {
+    "countdown-timer-js": "^1.0.3",
+    "moment": "^2.19.4"
+  }
+}
