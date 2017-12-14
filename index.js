@@ -53,6 +53,11 @@ let timerSetup = () => {
       talk2mCheck().then((response) => {
         if(response){
           if(failedFlag){
+            sendAlert(formatSuccessMessage).then((response) => {
+              return true;
+            }).catch((error) => {
+              return false;
+            });
           }
           failedLogins = 0;
           lastReachableTime = moment().format('MMMM Do YYYY, h:mm:ss a');;
@@ -62,6 +67,11 @@ let timerSetup = () => {
         console.log(error);
         failedLogins++;
         if(failedLogins === 5){
+          sendAlert(formatErrorMessage).then((response) => {
+            return true;
+          }).catch((error) => {
+            return false;
+          });
         }
         updateTime(0,0,30);
       })
