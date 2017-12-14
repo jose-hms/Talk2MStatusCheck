@@ -33,10 +33,20 @@ let updateTime = (hours, minutes, seconds) => {
 
   timer.setTimes(hours + ":" + minutes + ":" + seconds);
 }
-let failedLogins = 0;
-let lastReachableTime = null;
-let failedFlag = false;
-var duration = 0;
+
+//Required application variables.
+let failedLogins = 0; //Keep track of the number of failed attempts.
+let lastReachableTime = null; //Keep a running count of when the server was last reachable
+let failedFlag = false; //Boolean to determine it failed once so we can notify users
+
+/*
+This subscription to the timer is what actually triggers the Talk2M check.
+On completion of the countdown the application will attempt to log in to Talk2M.
+If successful it will log the time and keep the timer going at 5 minute intervals.
+If failed it will log an error in the counter and set the timer to 30 second checks.
+If the application fails on teh 30 second checks 5 times in a row a notification is
+sent to the eWON support team.
+*/
 let timerSetup = () => {
   timer.subscribe((times, parameters) => {
     if(timer.isFinal()){
@@ -59,11 +69,15 @@ let timerSetup = () => {
   });
 }
 
+//To keep credentials secure a separate .json file will be added to the server.
+//It will not be committed here.
 var userCredentials = JSON.parse(fs.readFileSync('user.json'));
 let devId = userCredentials.developerId;
 let account = userCredentials.account;
 let user = userCredentials.username;
 let pass = userCredentials.password;
+
+//Simple api query to log in to Talk2M. Resolves with pass or fail (true/false)
 var talk2mCheck = () => {
   return new Promise((resolve, reject) => {
   axios.get(loginUrl + 't2mdeveloperid=' + devId + '&t2maccount=' + account + '&t2musername=' + user + '&t2mpassword=' + pass)
@@ -76,6 +90,7 @@ var talk2mCheck = () => {
 });
 }
 
+//API request to hms.how to send a notification to users .
 var hmsHowPmUrl = 'https://forum.hms-networks.com/posts';
 let sendAlert = (message) => {
   var formData = {
@@ -96,16 +111,17 @@ let sendAlert = (message) => {
   if (err) {
     return console.error('upload failed:', err);
   }
-  console.log('Upload successful!  Server responded with:', body);
 });
 }
 
+//Format the error message when server unreacable.
 var formatErrorMessage = () => {
   return 'The Talk2M servers have been unreachable for five consecutive attempts.\n\n' +
   '<b>Server Last Reachable At: ' + lastReachableTime + '</b>\n\n' +
   'This application will continue monitoring and will advise when the servers are\n rechable again.'
 }
 
+//Format success message when server is reachable.
 var formatSuccessMessage= () => {
   return 'The Talk2M servers after a period of failure because reachable again. \n\n' +
   '<b>Servers Reachable Again at: ' + lastReachableTime + '</b>\n\n' +
