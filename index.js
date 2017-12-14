@@ -1,6 +1,9 @@
 //Import required libs
 var timers = require('countdown-timer-js');
+var fs = require('fs');
 var moment = require('moment');
+var FormData = require('form-data');
+var request = require('request');
 const axios = require('axios');
 
 //Global variables
@@ -10,7 +13,7 @@ let loginUrl = 'https://m2web.talk2m.com/t2mapi/login?';
 let initializeApplication = () => {
   console.log('Setting initial time span to five minutes.');
   timer = new CountDownTimer("00:00:00");
-  updateTime(0, 0, 5);
+  updateTime(0, 5, 0);
   timerSetup();
 }
 
@@ -31,36 +34,36 @@ let updateTime = (hours, minutes, seconds) => {
   timer.setTimes(hours + ":" + minutes + ":" + seconds);
 }
 let failedLogins = 0;
-
+let lastReachableTime = null;
+let failedFlag = false;
+var duration = 0;
 let timerSetup = () => {
   timer.subscribe((times, parameters) => {
-    console.log('Timer: ', times);
     if(timer.isFinal()){
-      var x = talk2mCheck();
-      x.then((response) => {
+      talk2mCheck().then((response) => {
         if(response){
-          console.log('Successful M2Web Login At: ', moment().format('MMMM Do YYYY, h:mm:ss a'));
+          if(failedFlag){
+          }
           failedLogins = 0;
-          updateTime(0,0,10);
+          lastReachableTime = moment().format('MMMM Do YYYY, h:mm:ss a');;
+          updateTime(0,5,0);
         }
       }).catch((error) => {
+        console.log(error);
         failedLogins++;
-        console.log('Failed to login in to M2Web At: ', moment().format('MMMM Do YYYY, h:mm:ss a'));
-        console.log('Reducing timer interval to 30 second checks...');
         if(failedLogins === 5){
-          //TODO: Send a notification to admins advising to a failed server login for 5 consecutive attempts.
         }
-        updateTime(0,0,15);
-        timer.start();
+        updateTime(0,0,30);
       })
     }
   });
 }
 
-let devId = "";
-let account = "";
-let user = "";
-let pass = "";
+var userCredentials = JSON.parse(fs.readFileSync('user.json'));
+let devId = userCredentials.developerId;
+let account = userCredentials.account;
+let user = userCredentials.username;
+let pass = userCredentials.password;
 var talk2mCheck = () => {
   return new Promise((resolve, reject) => {
   axios.get(loginUrl + 't2mdeveloperid=' + devId + '&t2maccount=' + account + '&t2musername=' + user + '&t2mpassword=' + pass)
@@ -68,7 +71,6 @@ var talk2mCheck = () => {
     resolve(response.data.success);
   })
   .catch(error => {
-    console.log('Rejecting with falst');
     reject(false);
   });
 });
