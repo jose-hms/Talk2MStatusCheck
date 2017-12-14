@@ -79,8 +79,8 @@ var talk2mCheck = () => {
 var hmsHowPmUrl = 'https://forum.hms-networks.com/posts';
 let sendAlert = (message) => {
   var formData = {
-  'api_key': '6a066ac9d7c5ac1f94fbb428ef61a0ec9dddf44009b6b79d921ee1afedc94381',
-  'api_username': 'system',
+  'api_key': userCredentials.discourse.api_key,
+  'api_username': userCredentials.discourse.api_username,
   'title': 'Talk2M Monitor Notification',
   'raw': message,
   'target_usernames': 'jordan_hms',
