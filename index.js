@@ -76,4 +76,40 @@ var talk2mCheck = () => {
 });
 }
 
+var hmsHowPmUrl = 'https://forum.hms-networks.com/posts';
+let sendAlert = (message) => {
+  var formData = {
+  'api_key': '6a066ac9d7c5ac1f94fbb428ef61a0ec9dddf44009b6b79d921ee1afedc94381',
+  'api_username': 'system',
+  'title': 'Talk2M Monitor Notification',
+  'raw': message,
+  'target_usernames': 'jordan_hms',
+  'archetype': 'private_message'
+}
+
+  const config = { headers: { 'Content-Type': 'multipart/form-data' } };
+
+  request.post({
+    url: 'https://forum.hms-networks.com/posts',
+    form: formData
+  }, function optionalCallback(err, httpResponse, body) {
+  if (err) {
+    return console.error('upload failed:', err);
+  }
+  console.log('Upload successful!  Server responded with:', body);
+});
+}
+
+var formatErrorMessage = () => {
+  return 'The Talk2M servers have been unreachable for five consecutive attempts.\n\n' +
+  '<b>Server Last Reachable At: ' + lastReachableTime + '</b>\n\n' +
+  'This application will continue monitoring and will advise when the servers are\n rechable again.'
+}
+
+var formatSuccessMessage= () => {
+  return 'The Talk2M servers after a period of failure because reachable again. \n\n' +
+  '<b>Servers Reachable Again at: ' + lastReachableTime + '</b>\n\n' +
+  'Server was unreachable for: ' + duration;
+}
+
 initializeApplication();
