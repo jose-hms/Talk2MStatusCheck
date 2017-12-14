@@ -53,25 +53,16 @@ let timerSetup = () => {
       talk2mCheck().then((response) => {
         if(response){
           if(failedFlag){
-            sendAlert(formatSuccessMessage).then((response) => {
-              return true;
-            }).catch((error) => {
-              return false;
-            });
+            sendAlert(formatSuccessMessage());
           }
           failedLogins = 0;
           lastReachableTime = moment().format('MMMM Do YYYY, h:mm:ss a');;
           updateTime(0,5,0);
         }
       }).catch((error) => {
-        console.log(error);
         failedLogins++;
         if(failedLogins === 5){
-          sendAlert(formatErrorMessage).then((response) => {
-            return true;
-          }).catch((error) => {
-            return false;
-          });
+          sendAlert(formatErrorMessage);
         }
         updateTime(0,0,30);
       })
@@ -108,7 +99,7 @@ let sendAlert = (message) => {
   'api_username': userCredentials.discourse.api_username,
   'title': 'Talk2M Monitor Notification',
   'raw': message,
-  'target_usernames': 'jordan_hms',
+  'target_usernames': userCredentials.discourse.users,
   'archetype': 'private_message'
 }
 
@@ -133,9 +124,8 @@ var formatErrorMessage = () => {
 
 //Format success message when server is reachable.
 var formatSuccessMessage= () => {
-  return 'The Talk2M servers after a period of failure because reachable again. \n\n' +
-  '<b>Servers Reachable Again at: ' + lastReachableTime + '</b>\n\n' +
-  'Server was unreachable for: ' + duration;
+  return 'The Talk2M servers after a period of failure became reachable again. \n\n' +
+  '<b>Servers Reachable Again at: ' + lastReachableTime + '</b>.';
 }
 
 initializeApplication();
